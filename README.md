@@ -17,9 +17,7 @@ Add the plugin to your root `build.gradle`, like:
 ```groovy
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        jcenter()
     }
     dependencies {
         classpath 'gradle.plugin.com.github.willir.rust.cargo-ndk-android:plugin:0.1.0'
