@@ -1,0 +1,33 @@
+plugins {
+    id 'groovy'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.9.10'
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'org.willir29.rust.cargo-ndk-android-gradle'
+            implementationClass = 'org.willir29.rust.CargoNdkBuildPlugin'
+        }
+    }
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+}
+
+pluginBundle {
+    // website = 'https://github.com/mozilla/rust-android-gradle'
+    // vcsUrl = 'https://github.com/mozilla/rust-android-gradle.git'
+
+    plugins {
+        rustAndroidPlugin {
+            id = 'org.willir29.rust.cargo-ndk-android-gradle'
+            displayName = 'Plugin for building Rust with Cargo NDK in Android projects'
+            description = 'A plugin that helps build Rust JNI libraries with Cargo NDK for use in Android projects.'
+            tags = ['rust', 'cargo', 'cargo-ndk', 'android']
+        }
+    }
+}

@@ -1,0 +1,2 @@
+rootProject.name = 'cargo-ndk-android'
+include ':plugin'
