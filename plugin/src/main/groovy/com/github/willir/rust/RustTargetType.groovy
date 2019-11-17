@@ -1,6 +1,6 @@
-package org.willir29.rust
+package com.github.willir.rust
 
-import org.gradle.api.GradleException
+import java.lang.IllegalArgumentException
 
 enum RustTargetType {
     ARM64("arm64", "aarch64-linux-android", "arm64-v8a"),
@@ -18,6 +18,10 @@ enum RustTargetType {
         this.jniLibDirName = jniLibDirName
     }
 
+    static void validateTargetIds(ArrayList<String> ids) {
+        ids.each { fromId(it) }
+    }
+
     static RustTargetType fromId(String id) {
         String idLow = id.toLowerCase()
         RustTargetType res = values().find {
@@ -28,7 +32,7 @@ enum RustTargetType {
         } else if (idLow == "arm_v7" || idLow == "armv7") {
             return ARM_V7
         } else {
-            throw new GradleException(
+            throw new IllegalArgumentException(
                     "Wrong rust target: '" + id + "' supported: " + values().collect { it.id })
         }
     }

@@ -1,4 +1,4 @@
-package org.willir29.rust
+package com.github.willir.rust
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -10,7 +10,7 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
 
         project.android.applicationVariants.all { variant ->
             def variantUpper = variant.name.capitalize()
-            project.task(type: BuildCargoNdk, "buildCargoNdk" + variantUpper) {
+            project.task(type: CargoNdkBuildTask, "buildCargoNdk" + variantUpper) {
                 group = "Build"
                 description = "Build rust library for variant " + variant.name
                 setVariant(variant.name)

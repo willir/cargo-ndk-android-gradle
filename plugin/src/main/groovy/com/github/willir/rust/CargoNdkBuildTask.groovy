@@ -1,7 +1,9 @@
-package org.willir29.rust
+package com.github.willir.rust
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Files
@@ -9,14 +11,15 @@ import java.nio.file.Paths
 import java.nio.file.Path
 import groovy.json.JsonSlurper
 
-class BuildCargoNdk extends DefaultTask {
-    String variant
-    CargoNdkBuildType args
-    CargoNdkBuildPluginExtension extension
+class CargoNdkBuildTask extends DefaultTask {
+    @Input String variant
+    @Input CargoNdkBuildPluginExtension extension
+
+    private CargoNdkConfig args
 
     @TaskAction
     void buildRust() {
-        args = new CargoNdkBuildType(
+        args = new CargoNdkConfig(
                 "", extension.buildTypeContainer.findByName(variant), extension)
 
         RustTargetType rustTargetName = null
@@ -28,7 +31,7 @@ class BuildCargoNdk extends DefaultTask {
         if (rustTargetName != null) {
             buildTarget(rustTargetName)
         } else {
-            for (target in args.supportedTypes) {
+            for (target in args.getTargetTypes()) {
                 buildTarget(target)
             }
         }
@@ -54,9 +57,10 @@ class BuildCargoNdk extends DefaultTask {
             cmd.addAll(args.extraCargoBuildArguments)
         }
 
-        logger.info("Executiong: " + cmd)
+        logger.info("Executing: " + cmd)
+        cwd = getCargoPath()
         project.exec {
-            workingDir = getCargoPath()
+            workingDir = cwd
             commandLine = cmd
         }.assertNormalExitValue()
 
@@ -96,7 +100,7 @@ class BuildCargoNdk extends DefaultTask {
                 target.jniLibDirName, libName)
     }
 
-    Path getCargoPath() {
+    private Path getCargoPath() {
         if (args.module) {
             return args.module
         } else {
@@ -165,6 +169,6 @@ class BuildCargoNdk extends DefaultTask {
     }
 
     private boolean isVerbose() {
-        return args.verbose || gradle.startParameter.logLevel <= LogLevel.INFO
+        return args.verbose || project.logger.isEnabled(LogLevel.INFO)
     }
 }

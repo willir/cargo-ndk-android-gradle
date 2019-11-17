@@ -1,11 +1,12 @@
-package org.willir29.rust
+package com.github.willir.rust
 
+import java.lang.IllegalArgumentException
 import java.nio.file.Path
 
-class CargoNdkBuildType {
+class CargoNdkConfig {
     final String name
 
-    ArrayList<RustTargetType> supportedTypes = null
+    ArrayList<String> targets = null
     Path module = null
     Path targetDirectory = null
     ArrayList<String> librariesNames = null
@@ -15,18 +16,18 @@ class CargoNdkBuildType {
     ArrayList<String> extraCargoBuildArguments = null
     Boolean verbose = null
 
-    CargoNdkBuildType(final String name) {
+    CargoNdkConfig(final String name) {
         this.name = name
         if (name in ["release", "debug"]) {
             buildType = name
         }
     }
 
-    CargoNdkBuildType(final String name,
-                      final CargoNdkBuildType that,
-                      CargoNdkBuildPluginExtension ext) {
+    CargoNdkConfig(final String name,
+                   final CargoNdkConfig that,
+                   CargoNdkBuildPluginExtension ext) {
         this.name = name
-        this.supportedTypes = ext.supportedTypes
+        this.targets = ext.targets
         this.module = ext.module
         this.targetDirectory = ext.targetDirectory
         this.librariesNames = ext.librariesNames
@@ -40,8 +41,8 @@ class CargoNdkBuildType {
             validate()
             return
         }
-        if (that.supportedTypes != null) {
-            this.supportedTypes = that.supportedTypes
+        if (that.targets != null) {
+            this.targets = that.targets
         }
         if (that.module != null) {
             this.module = that.module
@@ -70,9 +71,24 @@ class CargoNdkBuildType {
         validate()
     }
 
+    void setTargets(ArrayList<String> targets) {
+        RustTargetType.validateTargetIds(targets)
+        this.targets = targets
+    }
+
+    ArrayList<RustTargetType> getTargetTypes() {
+        return targets.collect { RustTargetType.fromId(it) }
+    }
+
     private void validate() {
-        if (!["release", "debug"].contains(buildType)) {
-            throw new IllegalArgumentException("buildType must be either 'relase' or 'debug'")
+        if (buildType == "dev") {
+            buildType = "debug"
         }
+        if (!["release", "debug"].contains(buildType)) {
+            throw new IllegalArgumentException("buildType must be either 'release', 'debug', or 'dev'. " +
+                    "Where 'dev' is synonym for debug")
+        }
+
+        RustTargetType.validateTargetIds(targets)
     }
 }
