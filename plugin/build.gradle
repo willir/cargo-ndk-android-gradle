@@ -4,6 +4,9 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.9.10'
 }
 
+apply plugin: "java-gradle-plugin"
+apply plugin: "maven-publish"
+
 gradlePlugin {
     plugins {
         simplePlugin {
@@ -16,6 +19,7 @@ gradlePlugin {
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
+    implementation "com.android.tools.build:gradle:3.1.2"
 }
 
 pluginBundle {
