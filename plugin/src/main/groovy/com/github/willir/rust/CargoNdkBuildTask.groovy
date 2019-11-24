@@ -58,7 +58,7 @@ class CargoNdkBuildTask extends DefaultTask {
         }
 
         logger.info("Executing: " + cmd)
-        cwd = getCargoPath()
+        Path cwd = getCargoPath()
         project.exec {
             workingDir = cwd
             commandLine = cmd
