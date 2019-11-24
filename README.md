@@ -10,6 +10,8 @@ build the project. Also, it allows configuring rust release profile (`dev` vs `r
 for each gradle `buildType`. Actually, any options can be configured per gradle `buildType`,
 it works similar to `android` configuration.
 
+[Gradle Plugin Page](https://plugins.gradle.org/plugin/com.github.willir.rust.cargo-ndk-android).
+
 ## Usage
 
 Add the plugin to your root `build.gradle`, like:
@@ -17,10 +19,12 @@ Add the plugin to your root `build.gradle`, like:
 ```groovy
 buildscript {
     repositories {
-        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.willir.rust.cargo-ndk-android:plugin:0.1.0'
+        classpath "gradle.plugin.com.github.willir.rust:plugin:0.1.1"
     }
 }
 ```
@@ -31,7 +35,7 @@ add the `cargoNdk` configuration (optionally):
 ```groovy
 android { ... }
 
-apply plugin: com.github.willir.rust.CargoNdkBuildPlugin
+apply plugin: "com.github.willir.rust.cargo-ndk-android"
 
 // The following configuration is optional and works the same way by default
 cargoNdk {
