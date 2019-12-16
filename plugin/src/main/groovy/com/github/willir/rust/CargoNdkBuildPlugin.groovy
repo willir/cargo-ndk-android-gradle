@@ -8,7 +8,11 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
     void apply(Project project) {
         def ext = project.extensions.create("cargoNdk", CargoNdkBuildPluginExtension, project)
 
-        project.android.applicationVariants.all { variant ->
+        def variants = project.android.hasProperty("applicationVariants")
+                ? project.android.applicationVariants
+                : project.android.libraryVariants
+
+        variants.all { variant ->
             def variantUpper = variant.name.capitalize()
             project.task(type: CargoNdkBuildTask, "buildCargoNdk" + variantUpper) {
                 group = "Build"
@@ -19,7 +23,7 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
         }
 
         project.tasks.whenTaskAdded { task ->
-            project.android.applicationVariants.all{ variant ->
+            variants.all{ variant ->
                 def variantName = variant.name
                 def variantUpper = variantName.capitalize()
                 def preTasks = ["compile" + variantUpper + "Sources" ,
