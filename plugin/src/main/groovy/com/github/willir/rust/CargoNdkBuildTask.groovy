@@ -86,11 +86,8 @@ class CargoNdkBuildTask extends DefaultTask {
     }
 
     private Path getRustTargetPath() {
-        if (args.targetDirectory != null) {
-            return args.targetDirectory
-        } else {
-            return Paths.get(getCargoPath().toString(), "target")
-        }
+        def targetDir = (args.targetDirectory != null) ? args.targetDirectory : "target"
+        return Paths.get(getCargoPath().toString(), targetDir)
     }
 
     private Path getJniLibPath(RustTargetType target, String libName) {
@@ -102,7 +99,7 @@ class CargoNdkBuildTask extends DefaultTask {
 
     private Path getCargoPath() {
         if (args.module) {
-            return args.module
+            return Paths.get(project.rootDir.getPath(), args.module)
         } else {
             return Paths.get(getSrcRootPath().toString(), "rust")
         }

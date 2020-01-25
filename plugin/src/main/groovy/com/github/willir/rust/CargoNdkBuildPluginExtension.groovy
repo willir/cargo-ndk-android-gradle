@@ -8,8 +8,8 @@ import java.nio.file.Path
 
 class CargoNdkBuildPluginExtension {
     ArrayList<String> targets = RustTargetType.values().collect { it.id }
-    Path module = null
-    Path targetDirectory = null
+    String module = null
+    String targetDirectory = null
     ArrayList<String> librariesNames = null
     Integer apiLevel = null
     boolean offline = false

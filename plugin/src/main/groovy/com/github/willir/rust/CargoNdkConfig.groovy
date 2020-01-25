@@ -1,14 +1,12 @@
 package com.github.willir.rust
 
-import java.lang.IllegalArgumentException
-import java.nio.file.Path
 
 class CargoNdkConfig {
     final String name
 
     ArrayList<String> targets = null
-    Path module = null
-    Path targetDirectory = null
+    String module = null
+    String targetDirectory = null
     ArrayList<String> librariesNames = null
     Integer apiLevel = null
     Boolean offline = null
