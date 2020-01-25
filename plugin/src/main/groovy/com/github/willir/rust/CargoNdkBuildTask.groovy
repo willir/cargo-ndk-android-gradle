@@ -148,7 +148,7 @@ class CargoNdkBuildTask extends DefaultTask {
 
         return rootPackage.targets
                 .findAll { it.kind.indexOf("dylib") != -1 }
-                .collect { "lib" + it.name + ".so" }
+                .collect { "lib" + (String) it.name + ".so" }
     }
 
     private int getNdkVersion(RustTargetType target) {

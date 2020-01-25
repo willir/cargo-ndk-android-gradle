@@ -25,7 +25,7 @@ class CargoNdkConfig {
 
     CargoNdkConfig(final String name,
                    final CargoNdkConfig that,
-                   CargoNdkBuildPluginExtension ext) {
+                   final CargoNdkBuildPluginExtension ext) {
         this.name = name
         this.targets = ext.targets
         this.module = ext.module
