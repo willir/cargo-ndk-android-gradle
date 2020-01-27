@@ -6,7 +6,7 @@ import org.gradle.api.Project
 class CargoNdkBuildPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        def ext = project.extensions.create("cargoNdk", CargoNdkBuildPluginExtension, project)
+        def ext = project.extensions.create("cargoNdk", CargoNdkExtension, project)
 
         def variants = project.android.hasProperty("applicationVariants")
                 ? project.android.applicationVariants

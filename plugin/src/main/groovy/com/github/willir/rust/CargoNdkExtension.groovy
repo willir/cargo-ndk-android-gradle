@@ -4,9 +4,7 @@ import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
-import java.nio.file.Path
-
-class CargoNdkBuildPluginExtension {
+class CargoNdkExtension {
     ArrayList<String> targets = RustTargetType.values().collect { it.id }
     String module = null
     String targetDirectory = null
@@ -22,15 +20,16 @@ class CargoNdkBuildPluginExtension {
         this.targets = targets
     }
 
-    NamedDomainObjectContainer<CargoNdkConfig> buildTypeContainer
+    NamedDomainObjectContainer<CargoNdkBuildTypeExtension> buildTypeContainer
 
-    CargoNdkBuildPluginExtension(Project project) {
-        buildTypeContainer = project.container(CargoNdkConfig)
+    CargoNdkExtension(Project project) {
+        buildTypeContainer = project.container(CargoNdkBuildTypeExtension)
         buildTypeContainer.create("release")
         buildTypeContainer.create("debug")
     }
 
-    void buildTypes(Action<? super NamedDomainObjectContainer<CargoNdkConfig>> action) {
+    void buildTypes(
+            Action<? super NamedDomainObjectContainer<CargoNdkBuildTypeExtension>> action) {
         action.execute(buildTypeContainer)
     }
 }

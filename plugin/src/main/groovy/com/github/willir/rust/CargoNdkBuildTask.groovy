@@ -2,25 +2,25 @@ package com.github.willir.rust
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.Path
 import groovy.json.JsonSlurper
 
 class CargoNdkBuildTask extends DefaultTask {
     @Input String variant
-    @Input CargoNdkBuildPluginExtension extension
+    @Input CargoNdkExtension extension
 
-    private CargoNdkConfig args
+    private CargoNdkConfig config
 
     @TaskAction
     void buildRust() {
-        args = new CargoNdkConfig(
-                "", extension.buildTypeContainer.findByName(variant), extension)
+        config = new CargoNdkConfig(
+                project,
+                extension.buildTypeContainer.findByName(variant),
+                extension)
 
         RustTargetType rustTargetName = null
 
@@ -31,7 +31,7 @@ class CargoNdkBuildTask extends DefaultTask {
         if (rustTargetName != null) {
             buildTarget(rustTargetName)
         } else {
-            for (target in args.getTargetTypes()) {
+            for (target in config.getTargetTypes()) {
                 buildTarget(target)
             }
         }
@@ -44,24 +44,26 @@ class CargoNdkBuildTask extends DefaultTask {
                    "--target", target.rustTarget,
                    "--android-platform", ndkVersion.toString(),
                    "--", "build"]
-        if (args.offline) {
+        if (config.offline) {
             cmd.add("--offline")
         }
-        if (isRelease()) {
+        if (config.isRelease()) {
             cmd.add("--release")
         }
-        if (isVerbose()) {
+        if (config.isVerbose()) {
             cmd.add("--verbose")
         }
-        if (args.extraCargoBuildArguments != null) {
-            cmd.addAll(args.extraCargoBuildArguments)
+        if (config.extraCargoBuildArguments != null) {
+            cmd.addAll(config.extraCargoBuildArguments)
         }
 
+        Path cwd = config.getCargoPath()
         logger.info("Executing: " + cmd)
-        Path cwd = getCargoPath()
+
         project.exec {
             workingDir = cwd
             commandLine = cmd
+            environment extraEnv
         }.assertNormalExitValue()
 
         copyTarget(target)
@@ -69,8 +71,8 @@ class CargoNdkBuildTask extends DefaultTask {
 
     private void copyTarget(RustTargetType target) {
         for (libName in listLibraryNames()) {
-            def copyFrom = getRustLibOutPath(target, libName)
-            def copyTo = getJniLibPath(target, libName)
+            def copyFrom = config.getRustLibOutPath(target, libName)
+            def copyTo = config.getJniLibPath(target, libName)
 
             Files.createDirectories(copyTo.getParent())
 
@@ -80,50 +82,22 @@ class CargoNdkBuildTask extends DefaultTask {
         }
     }
 
-    private Path getRustLibOutPath(RustTargetType target, String libName) {
-        return Paths.get(
-                getRustTargetPath().toString(), target.rustTarget, args.buildType, libName)
-    }
-
-    private Path getRustTargetPath() {
-        def targetDir = (args.targetDirectory != null) ? args.targetDirectory : "target"
-        return Paths.get(getCargoPath().toString(), targetDir)
-    }
-
-    private Path getJniLibPath(RustTargetType target, String libName) {
-        return Paths.get(
-                getSrcRootPath().toString(),
-                "jniLibs",
-                target.jniLibDirName, libName)
-    }
-
-    private Path getCargoPath() {
-        if (args.module) {
-            return Paths.get(project.rootDir.getPath(), args.module)
-        } else {
-            return Paths.get(getSrcRootPath().toString(), "rust")
-        }
-    }
-
-    private Path getSrcRootPath() {
-        return Paths.get(project.rootDir.getPath(), "app", "src", "main")
-    }
-
     private ArrayList<String> listLibraryNames() {
-        if (args.librariesNames != null) {
-            return args.librariesNames
+        if (config.librariesNames != null) {
+            return config.librariesNames
         } else {
-            return listCargoTargets(getCargoPath())
+            return listCargoTargets(config.getCargoPath())
         }
     }
 
     private ArrayList<String> listCargoTargets(Path cargoDirPath) {
         def cmd = ["cargo", "metadata", "--format-version", "1"]
-        if (args.offline) {
+        if (config.offline) {
             cmd.add("--offline")
         }
 
         def os = new ByteArrayOutputStream()
+
         project.exec {
             workingDir = cargoDirPath
             commandLine = cmd
@@ -149,9 +123,7 @@ class CargoNdkBuildTask extends DefaultTask {
     }
 
     private int getNdkVersion(RustTargetType target) {
-        int ndkVersion = (args.apiLevel != null)
-                ? args.apiLevel
-                : project.android.defaultConfig.minSdkVersion.getApiLevel()
+        int ndkVersion = config.apiLevel
         if (target.is64Bit() && ndkVersion < 21) {
             logger.warn(
                     "" + target + " doesn't support " + ndkVersion +
@@ -159,13 +131,5 @@ class CargoNdkBuildTask extends DefaultTask {
             ndkVersion = 21
         }
         return ndkVersion
-    }
-
-    private boolean isRelease() {
-        return args.buildType == "release"
-    }
-
-    private boolean isVerbose() {
-        return args.verbose || project.logger.isEnabled(LogLevel.INFO)
     }
 }

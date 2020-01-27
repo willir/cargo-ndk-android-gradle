@@ -1,7 +1,5 @@
 package com.github.willir.rust
 
-import java.lang.IllegalArgumentException
-
 enum RustTargetType {
     ARM64("arm64", "aarch64-linux-android", "arm64-v8a"),
     ARM_V7("arm", "armv7-linux-androideabi", "armeabi-v7a"),

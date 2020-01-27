@@ -1,30 +1,30 @@
 package com.github.willir.rust
 
+import org.gradle.api.Project
+import org.gradle.api.logging.LogLevel
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class CargoNdkConfig {
-    final String name
-
-    ArrayList<String> targets = null
-    String module = null
-    String targetDirectory = null
+    private ArrayList<String> targets = null
+    private String module = null
+    private String targetDirectory = null
     ArrayList<String> librariesNames = null
-    Integer apiLevel = null
+    private Integer apiLevel = null
     Boolean offline = null
-    String buildType = null
+    private String buildType = null
     ArrayList<String> extraCargoBuildArguments = null
-    Boolean verbose = null
+    private Boolean verbose = null
 
-    CargoNdkConfig(final String name) {
-        this.name = name
-        if (name in ["release", "debug"]) {
-            buildType = name
-        }
-    }
+    private Project project
 
-    CargoNdkConfig(final String name,
-                   final CargoNdkConfig that,
-                   final CargoNdkBuildPluginExtension ext) {
-        this.name = name
+    CargoNdkConfig(Project project,
+                   final CargoNdkBuildTypeExtension buildTypeExt,
+                   final CargoNdkExtension ext) {
+        this.project = project
+
         this.targets = ext.targets
         this.module = ext.module
         this.targetDirectory = ext.targetDirectory
@@ -35,47 +35,89 @@ class CargoNdkConfig {
         this.extraCargoBuildArguments = ext.extraCargoBuildArguments
         this.verbose = ext.verbose
 
-        if (that == null) {
+        if (buildTypeExt == null) {
             validate()
             return
         }
-        if (that.targets != null) {
-            this.targets = that.targets
+        if (buildTypeExt.targets != null) {
+            this.targets = buildTypeExt.targets
         }
-        if (that.module != null) {
-            this.module = that.module
+        if (buildTypeExt.module != null) {
+            this.module = buildTypeExt.module
         }
-        if (that.targetDirectory != null) {
-            this.targetDirectory = that.targetDirectory
+        if (buildTypeExt.targetDirectory != null) {
+            this.targetDirectory = buildTypeExt.targetDirectory
         }
-        if (that.librariesNames != null) {
-            this.librariesNames = that.librariesNames
+        if (buildTypeExt.librariesNames != null) {
+            this.librariesNames = buildTypeExt.librariesNames
         }
-        if (that.apiLevel != null) {
-            this.apiLevel = that.apiLevel
+        if (buildTypeExt.apiLevel != null) {
+            this.apiLevel = buildTypeExt.apiLevel
         }
-        if (that.offline != null) {
-            this.offline = that.offline
+        if (buildTypeExt.offline != null) {
+            this.offline = buildTypeExt.offline
         }
-        if (that.buildType != null) {
-            this.buildType = that.buildType
+        if (buildTypeExt.buildType != null) {
+            this.buildType = buildTypeExt.buildType
         }
-        if (that.extraCargoBuildArguments != null) {
-            this.extraCargoBuildArguments = that.extraCargoBuildArguments
+        if (buildTypeExt.extraCargoBuildArguments != null) {
+            this.extraCargoBuildArguments = buildTypeExt.extraCargoBuildArguments
         }
-        if (that.verbose != null) {
-            this.verbose = that.verbose
+        if (buildTypeExt.verbose != null) {
+            this.verbose = buildTypeExt.verbose
         }
         validate()
     }
 
-    void setTargets(ArrayList<String> targets) {
-        RustTargetType.validateTargetIds(targets)
-        this.targets = targets
-    }
-
     ArrayList<RustTargetType> getTargetTypes() {
         return targets.collect { RustTargetType.fromId(it) }
+    }
+
+    int getApiLevel() {
+        return (apiLevel != null)
+                ? apiLevel
+                : project.android.defaultConfig.minSdkVersion.getApiLevel()
+    }
+
+    boolean isVerbose() {
+        return verbose || project.logger.isEnabled(LogLevel.INFO)
+    }
+
+    boolean isRelease() {
+        return buildType == "release"
+    }
+
+    Path getRustLibOutPath(RustTargetType target, String libName) {
+        return Paths.get(
+                getRustTargetPath().toString(), target.rustTarget, buildType, libName)
+    }
+
+    Path getRustTargetPath() {
+        def targetDir = (targetDirectory != null) ? targetDirectory : "target"
+        return Paths.get(getCargoPath().toString(), targetDir)
+    }
+
+    Path getJniLibPath(RustTargetType target, String libName) {
+        return Paths.get(
+                getSrcRootPath().toString(),
+                "jniLibs",
+                target.jniLibDirName, libName)
+    }
+
+    String getProjectRootDir() {
+        return project.rootDir.getPath()
+    }
+
+    Path getCargoPath() {
+        if (module) {
+            return Paths.get(getProjectRootDir(), module)
+        } else {
+            return Paths.get(getSrcRootPath().toString(), "rust")
+        }
+    }
+
+    Path getSrcRootPath() {
+        return Paths.get(project.rootDir.getPath(), "app", "src", "main")
     }
 
     private void validate() {
@@ -83,10 +125,20 @@ class CargoNdkConfig {
             buildType = "debug"
         }
         if (!["release", "debug"].contains(buildType)) {
-            throw new IllegalArgumentException("buildType must be either 'release', 'debug', or 'dev'. " +
+            throw new IllegalArgumentException(
+                    "buildType must be either 'release', 'debug', or 'dev'. " +
                     "Where 'dev' is synonym for debug")
         }
 
         RustTargetType.validateTargetIds(targets)
+
+        def cargoTomlPath = Paths.get(getCargoPath().toString(), "Cargo.toml")
+        if (!Files.isRegularFile(cargoTomlPath)) {
+            throw new IllegalArgumentException(
+                    "Cannot find 'Cargo.toml' file in '${getCargoPath()}'.\n" +
+                            "Please set the 'cargoNdk.module' property " +
+                            "as a valid path to cargo project,\n" +
+                            "relative to the project root '${getProjectRootDir()}'.")
+        }
     }
 }
