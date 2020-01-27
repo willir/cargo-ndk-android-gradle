@@ -62,7 +62,13 @@ Install [`cargo-ndk`](https://github.com/bbqsrc/cargo-ndk):
 cargo install cargo-ndk
 ```
 
-And it will be built with your android project: 
+If you already have `cargo-ndk`, please make sure it is up to date:
+
+```bash
+cargo install --force cargo-ndk
+```
+
+And now cargo project will be built with your android project:
 
 1. `./gradlew buildDebug` will build `dev` (`debug`) profile
 1. `./gradlew buildRelease` will build `release` profile
