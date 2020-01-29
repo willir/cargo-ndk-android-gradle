@@ -58,7 +58,8 @@ class CargoNdkBuildTask extends DefaultTask {
         }
 
         Path cwd = config.getCargoPath()
-        logger.info("Executing: " + cmd)
+        def extraEnv = getExtraCargoNdkEnvironments()
+        logger.info("Executing: " + cmd + " from " + cwd + " with extra env: " + extraEnv)
 
         project.exec {
             workingDir = cwd
@@ -131,5 +132,17 @@ class CargoNdkBuildTask extends DefaultTask {
             ndkVersion = 21
         }
         return ndkVersion
+    }
+
+    private Map<String, Object> getExtraCargoNdkEnvironments() {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def ndkDir = properties.getProperty('ndk.dir', null)
+
+        if (ndkDir != null) {
+            return ['ANDROID_NDK_HOME': ndkDir]
+        } else {
+            return [:]
+        }
     }
 }
