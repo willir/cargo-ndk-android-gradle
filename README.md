@@ -71,7 +71,7 @@ cargo install --force cargo-ndk
 And now cargo project will be built with your android project:
 
 1. `./gradlew buildCargoNdkDebug` will build `dev` (`debug`) profile
-1. `./gradlew buildCargoNdkRelease` will build `release` profile
+2. `./gradlew buildCargoNdkRelease` will build `release` profile
 
 
 ## Configuration
