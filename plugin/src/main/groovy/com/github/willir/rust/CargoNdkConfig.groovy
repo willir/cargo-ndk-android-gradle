@@ -99,7 +99,7 @@ class CargoNdkConfig {
 
     Path getJniLibPath(RustTargetType target, String libName) {
         return Paths.get(
-                getSrcRootPath().toString(),
+                getProjectSrcMainRootPath().toString(),
                 "jniLibs",
                 target.jniLibDirName, libName)
     }
@@ -114,6 +114,10 @@ class CargoNdkConfig {
         } else {
             return Paths.get(getSrcRootPath().toString(), "rust")
         }
+    }
+
+    Path getProjectSrcMainRootPath() {
+        return Paths.get(project.projectDir.getPath(), "src", "main")
     }
 
     Path getSrcRootPath() {
