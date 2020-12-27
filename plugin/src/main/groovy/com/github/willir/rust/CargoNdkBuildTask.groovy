@@ -133,7 +133,7 @@ class CargoNdkBuildTask extends DefaultTask {
         }
 
         return rootPackage.targets
-                .findAll { it.kind.indexOf("dylib") != -1 }
+                .findAll { it.kind.contains("dylib") || it.kind.contains("cdylib") }
                 .collect { "lib" + (String) it.name + ".so" }
     }
 
