@@ -16,6 +16,7 @@ class CargoNdkConfig {
     Boolean offline = null
     private String buildType = null
     ArrayList<String> extraCargoBuildArguments = null
+    Map<String, String> extraCargoEnv = null
     private Boolean verbose = null
 
     private Project project
@@ -33,6 +34,7 @@ class CargoNdkConfig {
         this.offline = ext.offline
         this.buildType = ext.buildType
         this.extraCargoBuildArguments = ext.extraCargoBuildArguments
+        this.extraCargoEnv = ext.extraCargoEnv
         this.verbose = ext.verbose
 
         if (buildTypeExt == null) {
@@ -62,6 +64,9 @@ class CargoNdkConfig {
         }
         if (buildTypeExt.extraCargoBuildArguments != null) {
             this.extraCargoBuildArguments = buildTypeExt.extraCargoBuildArguments
+        }
+        if (buildTypeExt.extraCargoEnv != null) {
+            this.extraCargoEnv = buildTypeExt.extraCargoEnv
         }
         if (buildTypeExt.verbose != null) {
             this.verbose = buildTypeExt.verbose

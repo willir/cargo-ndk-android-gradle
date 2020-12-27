@@ -59,6 +59,9 @@ class CargoNdkBuildTask extends DefaultTask {
 
         Path cwd = config.getCargoPath()
         def extraEnv = getExtraCargoNdkEnvironments()
+        if (config.extraCargoEnv != null) {
+            extraEnv.putAll(config.extraCargoEnv)
+        }
         logger.info("Executing: " + cmd + " from " + cwd + " with extra env: " + extraEnv)
 
         project.exec {

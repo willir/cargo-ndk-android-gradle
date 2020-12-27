@@ -13,6 +13,7 @@ class CargoNdkExtension {
     boolean offline = false
     String buildType = "release"
     ArrayList<String> extraCargoBuildArguments = null
+    Map<String, String> extraCargoEnv = null
     boolean verbose = false
 
     void setTargets(ArrayList<String> targets) {

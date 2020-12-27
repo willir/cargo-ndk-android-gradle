@@ -24,7 +24,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.github.willir.rust:plugin:0.2.1"
+        classpath "gradle.plugin.com.github.willir.rust:plugin:0.3.0"
     }
 }
 ```
@@ -116,6 +116,10 @@ cargoNdk {
     // Extra arguments to pass to cargo command
     // By default: []
     extraCargoBuildArguments = ["--offline"]
+
+    // Extra environment variables
+    // By default: [:]
+    extraCargoEnv = ["foo": "bar"]
 
     // Whether to pass --verbose flag to cargo command
     // By default: false

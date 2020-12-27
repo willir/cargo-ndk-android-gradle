@@ -11,6 +11,7 @@ class CargoNdkBuildTypeExtension {
     Boolean offline = null
     String buildType = null
     ArrayList<String> extraCargoBuildArguments = null
+    Map<String, String> extraCargoEnv = null
     Boolean verbose = null
 
     CargoNdkBuildTypeExtension(final String name) {
