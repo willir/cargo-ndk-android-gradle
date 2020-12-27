@@ -145,6 +145,6 @@ cargoNdk {
 ### Specify target via gradle property
 
 You can also compile only one target by specifying the `rust-target` property to gradle.
-E.g. to build only `arm64` target you can: `gradle buildDebug -Prust-target=arm64`.
+E.g. to build only `arm64` target you can: `gradle assembleDebug -Prust-target=arm64`.
 It can be useful during development in order to speed up each build 
 via not rebuilding targets that are not used during testing.
