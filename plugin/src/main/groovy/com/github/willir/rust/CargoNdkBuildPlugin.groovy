@@ -26,7 +26,7 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
             variants.all{ variant ->
                 def variantName = variant.name
                 def variantUpper = variantName.capitalize()
-                def preTasks = ["compile" + variantUpper + "Sources" ,
+                def preTasks = ["compile" + variantUpper + "Sources",
                                 "merge" + variantUpper + "JniLibFolders"]
                 if (task.name in preTasks) {
                     task.dependsOn "buildCargoNdk" + variantUpper
@@ -35,4 +35,3 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
         }
     }
 }
-
