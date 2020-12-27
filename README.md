@@ -68,11 +68,14 @@ If you already have `cargo-ndk`, please make sure it is up to date:
 cargo install --force cargo-ndk
 ```
 
-And now cargo project will be built with your android project:
+This plugin adds the following targets: `buildCargoNdkDebug`,
+`buildCargoNdkRelease`, however they should be run automatically building your
+android project as usual. So:
 
-1. `./gradlew buildDebug` will build `dev` (`debug`) profile
-1. `./gradlew buildRelease` will build `release` profile
-
+1. `./gradlew assembleDebug` will build `dev` (`debug`) profile.
+   Depends on, and so will run `buildCargoNdkDebug`.
+1. `./gradlew assembleRelease` will build `release` profile.
+   Depends on, and so will run `buildCargoNdkRelease`.
 
 ## Configuration
 
