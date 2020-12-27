@@ -24,7 +24,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.github.willir.rust:plugin:0.3.0"
+        classpath "gradle.plugin.com.github.willir.rust:plugin:0.3.1"
     }
 }
 ```

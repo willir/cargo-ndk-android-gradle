@@ -7,6 +7,7 @@ import org.gradle.api.tasks.TaskAction
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import groovy.json.JsonSlurper
 
 class CargoNdkBuildTask extends DefaultTask {
@@ -38,6 +39,11 @@ class CargoNdkBuildTask extends DefaultTask {
     }
 
     private void buildTarget(RustTargetType target) {
+        if (!isFoundInPath("cargo")) {
+            throw new GradleException(
+                    "Cannot find 'cargo' executable in PATH: " + System.getenv("PATH"))
+        }
+
         int ndkVersion = getNdkVersion(target)
 
         def cmd = ["cargo", "ndk",
@@ -58,11 +64,16 @@ class CargoNdkBuildTask extends DefaultTask {
         }
 
         Path cwd = config.getCargoPath()
+        if (!cwd.toFile().isDirectory()) {
+            throw new GradleException(
+                    "Rust root directory doesn't exist, or not a directory: '${cwd}'")
+        }
+
         def extraEnv = getExtraCargoNdkEnvironments()
         if (config.extraCargoEnv != null) {
             extraEnv.putAll(config.extraCargoEnv)
         }
-        logger.info("Executing: " + cmd + " from " + cwd + " with extra env: " + extraEnv)
+        logger.info("Executing: ${cmd} from ${cwd} with extra env: ${extraEnv}")
 
         project.exec {
             workingDir = cwd
@@ -112,13 +123,13 @@ class CargoNdkBuildTask extends DefaultTask {
         def rootId = metadata.resolve.root
         if (rootId == null) {
             throw new GradleException(
-                    "cargo workspace at: '" + cargoDirPath + "' is a virtual workspace")
+                    "cargo workspace at: '${cargoDirPath}' is a virtual workspace")
         }
 
         def rootPackage = metadata.packages.find { it.id == rootId }
         if (rootPackage == null) {
             throw new GradleException(
-                    "Cannot find root package for cargo workspace at: '" + cargoDirPath + "'")
+                    "Cannot find root package for cargo workspace at: '${cargoDirPath}'")
         }
 
         return rootPackage.targets
@@ -129,9 +140,7 @@ class CargoNdkBuildTask extends DefaultTask {
     private int getNdkVersion(RustTargetType target) {
         int ndkVersion = config.apiLevel
         if (target.is64Bit() && ndkVersion < 21) {
-            logger.warn(
-                    "" + target + " doesn't support " + ndkVersion +
-                            " NDK version. Changing to 21")
+            logger.warn("${target} doesn't support ${ndkVersion} NDK version. Changing to 21")
             ndkVersion = 21
         }
         return ndkVersion
@@ -147,5 +156,19 @@ class CargoNdkBuildTask extends DefaultTask {
         } else {
             return [:]
         }
+    }
+
+    /**
+     * Checks if a file/command exists in PATH environment and can be executed
+     * @param file Name of the file/command to search
+     * @return true if found, else false
+     */
+    private boolean isFoundInPath(String file) {
+        def pathEnv = System.getenv('PATH')
+        def fileFound = pathEnv.split(File.pathSeparator).find{ folder ->
+            def f = Paths.get(folder, file).toFile()
+            return f.exists() && f.canExecute()
+        }
+        return fileFound != null
     }
 }
