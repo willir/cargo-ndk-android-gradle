@@ -1,5 +1,6 @@
 package com.github.willir.rust
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -39,9 +40,10 @@ class CargoNdkBuildTask extends DefaultTask {
     }
 
     private void buildTarget(RustTargetType target) {
-        if (!isFoundInPath("cargo")) {
+        def cargo = Os.isFamily(Os.FAMILY_WINDOWS) ? "cargo.exe" : "cargo"
+        if (!isFoundInPath(cargo)) {
             throw new GradleException(
-                    "Cannot find 'cargo' executable in PATH: " + System.getenv("PATH"))
+                    "Cannot find '" + cargo + "' executable in PATH: " + System.getenv("PATH"))
         }
 
         int ndkVersion = getNdkVersion(target)
