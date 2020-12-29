@@ -4,10 +4,10 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.internal.ExecException
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import groovy.json.JsonSlurper
 
 class CargoNdkBuildTask extends DefaultTask {
@@ -39,10 +39,7 @@ class CargoNdkBuildTask extends DefaultTask {
     }
 
     private void buildTarget(RustTargetType target) {
-        if (!isFoundInPath("cargo")) {
-            throw new GradleException(
-                    "Cannot find 'cargo' executable in PATH: " + System.getenv("PATH"))
-        }
+        validateHasCargo()
 
         int ndkVersion = getNdkVersion(target)
 
@@ -158,17 +155,27 @@ class CargoNdkBuildTask extends DefaultTask {
         }
     }
 
-    /**
-     * Checks if a file/command exists in PATH environment and can be executed
-     * @param file Name of the file/command to search
-     * @return true if found, else false
-     */
-    private boolean isFoundInPath(String file) {
-        def pathEnv = System.getenv('PATH')
-        def fileFound = pathEnv.split(File.pathSeparator).find{ folder ->
-            def f = Paths.get(folder, file).toFile()
-            return f.exists() && f.canExecute()
+    private void validateHasCargo() {
+        def cmd = ["cargo", "--version"]
+
+        int exitValue
+        def os = new ByteArrayOutputStream()
+        try {
+            def p = project.exec {
+                commandLine = cmd
+                standardOutput = os
+                errorOutput = os
+            }
+            exitValue = p.exitValue
+        } catch (ExecException ignored) {
+            exitValue = 1
         }
-        return fileFound != null
+        logger.info("`${cmd.join(" ")}` output: ${os.toString().trim()}")
+        if (exitValue != 0) {
+            throw new GradleException(
+                    "Failed to run `${cmd.join(" ")}`. " +
+                            "You probably don't have '${cmd[0]}' executable in PATH: " +
+                            System.getenv("PATH"))
+        }
     }
 }
