@@ -45,7 +45,7 @@ class CargoNdkBuildTask extends DefaultTask {
 
         def cmd = ["cargo", "ndk",
                    "--target", target.rustTarget,
-                   "--android-platform", ndkVersion.toString(),
+                   "--platform", ndkVersion.toString(),
                    "--", "build"]
         if (config.offline) {
             cmd.add("--offline")
