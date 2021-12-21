@@ -15,6 +15,7 @@ class CargoNdkConfig {
     private Integer apiLevel = null
     Boolean offline = null
     private String buildType = null
+    ArrayList<String> extraCargoNdkArguments = null
     ArrayList<String> extraCargoBuildArguments = null
     Map<String, String> extraCargoEnv = null
     private Boolean verbose = null
@@ -33,6 +34,7 @@ class CargoNdkConfig {
         this.apiLevel = ext.apiLevel
         this.offline = ext.offline
         this.buildType = ext.buildType
+        this.extraCargoNdkArguments = ext.extraCargoNdkArguments
         this.extraCargoBuildArguments = ext.extraCargoBuildArguments
         this.extraCargoEnv = ext.extraCargoEnv
         this.verbose = ext.verbose

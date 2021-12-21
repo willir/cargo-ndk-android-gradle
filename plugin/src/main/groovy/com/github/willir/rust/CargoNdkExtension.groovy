@@ -12,6 +12,7 @@ class CargoNdkExtension {
     Integer apiLevel = null
     boolean offline = false
     String buildType = "release"
+    ArrayList<String> extraCargoNdkArguments = null
     ArrayList<String> extraCargoBuildArguments = null
     Map<String, String> extraCargoEnv = null
     boolean verbose = false

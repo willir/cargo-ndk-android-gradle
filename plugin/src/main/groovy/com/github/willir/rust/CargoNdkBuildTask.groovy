@@ -45,8 +45,14 @@ class CargoNdkBuildTask extends DefaultTask {
 
         def cmd = ["cargo", "ndk",
                    "--target", target.rustTarget,
-                   "--platform", ndkVersion.toString(),
-                   "--", "build"]
+                   "--platform", ndkVersion.toString()]
+                   
+        if (config.extraCargoNdkArguments != null) {
+            cmd.addAll(config.extraCargoNdkArguments)
+        }
+
+        cmd.addAll(["--", "build"])
+
         if (config.offline) {
             cmd.add("--offline")
         }
