@@ -14,12 +14,16 @@ gradlePlugin {
             implementationClass = 'com.github.willir.rust.CargoNdkBuildPlugin'
         }
     }
+
+    tasks.withType(Copy).all {
+        duplicatesStrategy 'exclude'
+    }
 }
 
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation "com.android.tools.build:gradle:3.1.2"
+    implementation "com.android.tools.build:gradle:7.3.0"
 }
 
 pluginBundle {
