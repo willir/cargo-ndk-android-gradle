@@ -14,7 +14,7 @@ class CargoNdkConfig {
     ArrayList<String> librariesNames = null
     private Integer apiLevel = null
     Boolean offline = null
-    private String buildType = null
+    String profile = null
     ArrayList<String> extraCargoBuildArguments = null
     Map<String, String> extraCargoEnv = null
     private Boolean verbose = null
@@ -32,7 +32,7 @@ class CargoNdkConfig {
         this.librariesNames = ext.librariesNames
         this.apiLevel = ext.apiLevel
         this.offline = ext.offline
-        this.buildType = ext.buildType
+        this.profile = ext.profile
         this.extraCargoBuildArguments = ext.extraCargoBuildArguments
         this.extraCargoEnv = ext.extraCargoEnv
         this.verbose = ext.verbose
@@ -59,8 +59,8 @@ class CargoNdkConfig {
         if (buildTypeExt.offline != null) {
             this.offline = buildTypeExt.offline
         }
-        if (buildTypeExt.buildType != null) {
-            this.buildType = buildTypeExt.buildType
+        if (buildTypeExt.profile != null) {
+            this.profile = buildTypeExt.profile
         }
         if (buildTypeExt.extraCargoBuildArguments != null) {
             this.extraCargoBuildArguments = buildTypeExt.extraCargoBuildArguments
@@ -88,13 +88,10 @@ class CargoNdkConfig {
         return verbose || project.logger.isEnabled(LogLevel.INFO)
     }
 
-    boolean isRelease() {
-        return buildType == "release"
-    }
-
     Path getRustLibOutPath(RustTargetType target, String libName) {
+        def targetDir = (profile == "dev") ? "debug" : profile;
         return Paths.get(
-                getRustTargetPath().toString(), target.rustTarget, buildType, libName)
+                getRustTargetPath().toString(), target.rustTarget, targetDir, libName)
     }
 
     Path getRustTargetPath() {
@@ -130,13 +127,8 @@ class CargoNdkConfig {
     }
 
     private void validate() {
-        if (buildType == "dev") {
-            buildType = "debug"
-        }
-        if (!["release", "debug"].contains(buildType)) {
-            throw new IllegalArgumentException(
-                    "buildType must be either 'release', 'debug', or 'dev'. " +
-                    "Where 'dev' is synonym for debug")
+        if (profile == "debug") {
+            profile = "dev"
         }
 
         RustTargetType.validateTargetIds(targets)

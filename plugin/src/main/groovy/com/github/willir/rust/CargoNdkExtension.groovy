@@ -11,7 +11,7 @@ class CargoNdkExtension {
     ArrayList<String> librariesNames = null
     Integer apiLevel = null
     boolean offline = false
-    String buildType = "release"
+    String profile = "release"
     ArrayList<String> extraCargoBuildArguments = null
     Map<String, String> extraCargoEnv = null
     boolean verbose = false
