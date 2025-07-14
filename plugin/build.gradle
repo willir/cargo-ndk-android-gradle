@@ -1,37 +1,33 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.12.0'
+    id 'com.gradle.plugin-publish' version '1.3.0'
 }
 
-version = "0.3.4"
+version = "0.3.5"
 group = "com.github.willir.rust"
 
 gradlePlugin {
+    website = 'https://github.com/willir/cargo-ndk-android-gradle'
+    vcsUrl = 'https://github.com/willir/cargo-ndk-android-gradle.git'
+    
     plugins {
         cargoNdkAndroidPlugin {
             id = 'com.github.willir.rust.cargo-ndk-android'
             implementationClass = 'com.github.willir.rust.CargoNdkBuildPlugin'
+            displayName = 'Plugin for building Rust via Cargo NDK in Android projects'
+            description = 'A plugin that helps build Rust JNI libraries via Cargo NDK for use in Android projects.'
+            tags = ['rust', 'cargo', 'cargo-ndk', 'android']
         }
+    }
+
+    tasks.withType(Copy).all {
+        duplicatesStrategy = 'exclude'
     }
 }
 
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation "com.android.tools.build:gradle:3.1.2"
-}
-
-pluginBundle {
-    website = 'https://github.com/willir/cargo-ndk-android-gradle'
-    vcsUrl = 'https://github.com/willir/cargo-ndk-android-gradle.git'
-
-    plugins {
-        cargoNdkAndroidPlugin {
-            id = 'com.github.willir.rust.cargo-ndk-android'
-            displayName = 'Plugin for building Rust via Cargo NDK in Android projects'
-            description = 'A plugin that helps build Rust JNI libraries via Cargo NDK for use in Android projects.'
-            tags = ['rust', 'cargo', 'cargo-ndk', 'android']
-        }
-    }
+    implementation "com.android.tools.build:gradle:8.5.0"
 }

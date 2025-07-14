@@ -6,7 +6,7 @@ It is somewhat similar to the Mozilla
 [Rust Android Gradle Plugin](https://github.com/mozilla/rust-android-gradle),
 however, it uses [`cargo ndk`](https://github.com/bbqsrc/cargo-ndk)
 to find the right  `linker` and `ar` and
-build the project. Also, it allows configuring rust release profile (`dev` vs `release`)
+build the project. Also, it allows configuring the Cargo build profile (`dev`, `release` or custom)
 for each gradle `buildType`. Actually, any options can be configured per gradle `buildType`,
 it works similar to `android` configuration.
 
@@ -40,10 +40,10 @@ apply plugin: "com.github.willir.rust.cargo-ndk-android"
 cargoNdk {
     buildTypes {
         release {
-            buildType = "release"
+            profile = "release"
         }
         debug {
-            buildType = "debug"
+            profile = "dev"
         }
     }
 }
@@ -110,11 +110,11 @@ cargoNdk {
     // By default: false
     offline = true
 
-    // The rust profile to build
-    // Possible values: "debug", "release", "dev" (an alias for "debug")
+    // The Cargo profile to build
+    // Possible values: "dev", "release" or custom, as defined in your Cargo.toml.
     // By default: "release" for release gradle builds,
-    //             "debug"   for debug   gradle builds
-    buildType = "release"
+    //             "dev"     for debug   gradle builds
+    profile = "release"
 
     // Extra arguments to pass to cargo command
     // By default: []

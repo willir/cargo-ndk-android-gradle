@@ -13,7 +13,7 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
                 : project.android.libraryVariants
 
         variants.all { variant ->
-            def variantUpper = variant.name.capitalize()
+            def variantUpper = variant.name.substring(0, 1).toUpperCase() + variant.name.substring(1)
             project.task(type: CargoNdkBuildTask, "buildCargoNdk" + variantUpper) {
                 group = "Build"
                 description = "Build rust library for variant " + variant.name
@@ -25,7 +25,7 @@ class CargoNdkBuildPlugin implements Plugin<Project> {
         project.tasks.whenTaskAdded { task ->
             variants.all{ variant ->
                 def variantName = variant.name
-                def variantUpper = variantName.capitalize()
+                def variantUpper = variantName.substring(0, 1).toUpperCase() + variantName.substring(1)
                 def preTasks = ["compile" + variantUpper + "Sources",
                                 "merge" + variantUpper + "JniLibFolders"]
                 if (task.name in preTasks) {

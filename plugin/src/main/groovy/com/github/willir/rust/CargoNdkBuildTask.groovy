@@ -50,12 +50,10 @@ class CargoNdkBuildTask extends DefaultTask {
         if (config.offline) {
             cmd.add("--offline")
         }
-        if (config.isRelease()) {
-            cmd.add("--release")
-        }
         if (config.isVerbose()) {
             cmd.add("--verbose")
         }
+        cmd.addAll(["--profile", config.profile])
         if (config.extraCargoBuildArguments != null) {
             cmd.addAll(config.extraCargoBuildArguments)
         }
